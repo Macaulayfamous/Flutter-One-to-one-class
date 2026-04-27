@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_app/controllers/banner_controller.dart';
 import 'package:multi_app/models/banner_model.dart';
@@ -36,22 +37,21 @@ class _BannerWidgetState extends State<BannerWidget> {
           return const Center(child: Text('No Banners found'));
         }
 
-        return SizedBox(
-          height: 180,
-          width: double.infinity,
-          child: PageView.builder(
-            itemCount: banners.length,
-            itemBuilder: (context, index) {
-              final banner = banners[index];
-
-              return Container(
-                color: Colors.grey.shade300,
-                alignment: Alignment.center,
-                child: Image.network(banner.imageUrl),
-              );
-            },
+        return  CarouselSlider(items: banners.map((banner){
+          return Padding(padding: EdgeInsets.symmetric(
+            horizontal:  MediaQuery.of(context).size.width *0.025
+            
           ),
-        );
+          child: ClipRRect(
+            borderRadius: BorderRadiusGeometry.circular(12),
+            child: Image.network(banner.imageUrl),
+          ),
+          );
+        }).toList(), options: CarouselOptions(
+          height: MediaQuery.of(context).size.height * 0.22,
+          autoPlay: true,
+          autoPlayInterval: Duration(seconds: 3),
+        ));
       },
     );
   }
