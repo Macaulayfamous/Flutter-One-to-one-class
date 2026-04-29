@@ -15,8 +15,7 @@ class ProductController {
     if(response.statusCode==200){
       final List products = data['products'] ?? [];
 
-      return products.map((product) =>ProductModel.fromJson(product)).toList();
-    }else{
+    return products.map((product) => ProductModel.fromMap(product)).toList();    }else{
       throw Exception(data['details']?? "Something wrong");
     }
   }
