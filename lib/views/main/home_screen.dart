@@ -1,8 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:multi_app/views/main/widgets/banner_widget.dart';
 import 'package:multi_app/views/main/widgets/header_widget.dart';
 import 'package:multi_app/views/main/widgets/product_widget.dart';
+import 'package:multi_app/views/main/widgets/reusable_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,9 +19,10 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           HeaderWidget(),
           BannerWidget(),
+          ReusableWidget(title: 'Popular Products', subtitle: 'see all'),
           ProductWidget(),
         ],
-      )
+      ),
     );
   }
 }
