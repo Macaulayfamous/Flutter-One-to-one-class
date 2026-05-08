@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:multi_app/models/cart_model.dart';
 import 'package:multi_app/models/product_model.dart';
+import 'package:multi_app/provider/cart_notifier.dart';
 
-class ProductDetailScreen extends StatefulWidget {
+class ProductDetailScreen extends ConsumerStatefulWidget {
   final ProductModel product;
   const ProductDetailScreen({super.key, required this.product});
 
   @override
-  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+  ConsumerState<ProductDetailScreen> createState() =>
+      _ProductDetailScreenState();
 }
 
-class _ProductDetailScreenState extends State<ProductDetailScreen> {
+class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
+    final cartPro = ref.read(cartProvider.notifier);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -75,6 +80,52 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+      bottomSheet: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Container(
+          width: double.infinity,
+          height: 50,
+          decoration: BoxDecoration(
+            color: Colors.deepPurple,
+            borderRadius: BorderRadius.circular(8),
+          ),
+
+          child: Center(
+            child: InkWell(
+              onTap: () {
+                cartPro.addProduct(
+                  CartModel(
+                    id: widget.product.id,
+                    productName: widget.product.productName,
+                    category: widget.product.category,
+                    productPrice: widget.product.productPrice,
+                    imageUrl: widget.product.imageUrl,
+                    description: widget.product.description,
+                    vendor: widget.product.vendor,
+                    quantity: 1
+                  ),
+                );
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      "Product Added ${widget.product.productName}",
+                    ),
+                  ),
+                );
+              },
+              child: Text(
+                'ADD TO CART',
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Colors.white,
+                ),
+              ),
+            ),
           ),
         ),
       ),
