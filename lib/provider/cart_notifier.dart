@@ -38,7 +38,19 @@ class CartNotifier  extends Notifier<Map<String, CartModel>> {
   }
  }
 
+
+double getTotal(){
+  double total = 0.0;
+  for(var item in state.values){
+    total += item.productPrice  * item.quantity;
+  }
+
+  return total;
 }
+}
+
+
+
 
 final  cartProvider = NotifierProvider<CartNotifier,Map<String, CartModel>>(
   CartNotifier.new

@@ -14,8 +14,9 @@ class CartScreen extends ConsumerStatefulWidget {
 class _CartScreenState extends ConsumerState<CartScreen> {
   @override
   Widget build(BuildContext context) {
-    final _cartProvider = ref.read(cartProvider.notifier);
+    final cartPro = ref.read(cartProvider.notifier);
     final cartData = ref.watch(cartProvider);
+    final totalAmount = cartPro.getTotal();
     final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: PreferredSize(
@@ -127,7 +128,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                   children: [
                                     IconButton(
                                       onPressed: () {
-                                        _cartProvider.decrement(item.id);
+                                        cartPro.decrement(item.id);
                                       },
                                       icon: Icon(
                                         CupertinoIcons.minus,
@@ -144,7 +145,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                     ),
                                     IconButton(
                                       onPressed: () {
-                                        _cartProvider.increment(item.id);
+                                        cartPro.increment(item.id);
                                       },
                                       icon: Icon(
                                         CupertinoIcons.plus,
@@ -163,6 +164,38 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 );
               },
             ),
+
+      bottomSheet: Padding(
+        padding: EdgeInsets.all(10),
+        child: Container(
+          width: double.infinity,
+          height: 50,
+          decoration: BoxDecoration(color: Colors.blue),
+
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'CHECKOUT',
+                style: GoogleFonts.montserrat(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              SizedBox(width: 10),
+              Text(
+                '\$$totalAmount',
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  fontSize: 20,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
