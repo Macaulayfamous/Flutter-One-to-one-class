@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:multi_app/controllers/order_controller.dart';
 import 'package:multi_app/provider/cart_notifier.dart';
 
 class CartScreen extends ConsumerStatefulWidget {
@@ -12,6 +13,7 @@ class CartScreen extends ConsumerStatefulWidget {
 }
 
 class _CartScreenState extends ConsumerState<CartScreen> {
+  final OrderController _orderController = OrderController();
   @override
   Widget build(BuildContext context) {
     final cartPro = ref.read(cartProvider.notifier);
@@ -165,37 +167,54 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               },
             ),
 
-      bottomSheet: Padding(
-        padding: EdgeInsets.all(10),
-        child: Container(
-          width: double.infinity,
-          height: 50,
-          decoration: BoxDecoration(color: Colors.blue),
+      bottomSheet: totalAmount == 0.0
+          ? Text('')
+          : Padding(
+              padding: EdgeInsets.all(10),
+              child: GestureDetector(
+                onTap: () async {
+                  await _orderController.placeOrder(
+                    customerId: '12343',
+                    vendorId: cartData.values.first.vendor,
+                    productId: cartData.values.first.id,
+                    productName: cartData.values.first.productName,
+                    quantity: cartData.values.first.quantity,
+                    price: cartData.values.first.productPrice,
+                    deliveryAddress:
+                        'Jovee close avenu benin city, edo state nigeria ',
+                    phoneNumber: "+2348149106125",
+                  );
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 50,
+                  decoration: BoxDecoration(color: Colors.blue),
 
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'CHECKOUT',
-                style: GoogleFonts.montserrat(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'CHECKOUT',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        '\$$totalAmount',
+                        style: GoogleFonts.montserrat(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              SizedBox(width: 10),
-              Text(
-                '\$$totalAmount',
-                style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  fontSize: 20,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }

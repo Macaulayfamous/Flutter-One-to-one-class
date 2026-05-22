@@ -18,6 +18,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final cartPro = ref.read(cartProvider.notifier);
+    final isCart = ref.watch(cartProvider).containsKey(widget.product.id);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -89,34 +90,36 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           width: double.infinity,
           height: 50,
           decoration: BoxDecoration(
-            color: Colors.deepPurple,
+            color: isCart ? Colors.grey : Colors.deepPurple,
             borderRadius: BorderRadius.circular(8),
           ),
 
           child: Center(
             child: InkWell(
-              onTap: () {
-                cartPro.addProduct(
-                  CartModel(
-                    id: widget.product.id,
-                    productName: widget.product.productName,
-                    category: widget.product.category,
-                    productPrice: widget.product.productPrice,
-                    imageUrl: widget.product.imageUrl,
-                    description: widget.product.description,
-                    vendor: widget.product.vendor,
-                    quantity: 1
-                  ),
-                );
+              onTap: isCart
+                  ? null
+                  : () {
+                      cartPro.addProduct(
+                        CartModel(
+                          id: widget.product.id,
+                          productName: widget.product.productName,
+                          category: widget.product.category,
+                          productPrice: widget.product.productPrice,
+                          imageUrl: widget.product.imageUrl,
+                          description: widget.product.description,
+                          vendor: widget.product.vendor,
+                          quantity: 1,
+                        ),
+                      );
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      "Product Added ${widget.product.productName}",
-                    ),
-                  ),
-                );
-              },
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            "Product Added ${widget.product.productName}",
+                          ),
+                        ),
+                      );
+                    },
               child: Text(
                 'ADD TO CART',
                 style: GoogleFonts.montserrat(
