@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:multi_app/controllers/order_controller.dart';
 import 'package:multi_app/provider/cart_notifier.dart';
+import 'package:multi_app/views/main/productDetails/checkout_screen.dart';
 
 class CartScreen extends ConsumerStatefulWidget {
   const CartScreen({super.key});
@@ -173,17 +174,25 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               padding: EdgeInsets.all(10),
               child: GestureDetector(
                 onTap: () async {
-                  await _orderController.placeOrder(
-                    customerId: '12343',
-                    vendorId: cartData.values.first.vendor,
-                    productId: cartData.values.first.id,
-                    productName: cartData.values.first.productName,
-                    quantity: cartData.values.first.quantity,
-                    price: cartData.values.first.productPrice,
-                    deliveryAddress:
-                        'Jovee close avenu benin city, edo state nigeria ',
-                    phoneNumber: "+2348149106125",
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return CheckoutScreen();
+                      },
+                    ),
                   );
+                  // await _orderController.placeOrder(
+                  //   customerId: '12343',
+                  //   vendorId: cartData.values.first.vendor,
+                  //   productId: cartData.values.first.id,
+                  //   productName: cartData.values.first.productName,
+                  //   quantity: cartData.values.first.quantity,
+                  //   price: cartData.values.first.productPrice,
+                  //   deliveryAddress:
+                  //       'Jovee close avenu benin city, edo state nigeria ',
+                  //   phoneNumber: "+2348149106125",
+                  // );
                 },
                 child: Container(
                   width: double.infinity,
