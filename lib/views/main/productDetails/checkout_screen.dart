@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:multi_app/controllers/order_controller.dart';
 import 'package:multi_app/provider/cart_notifier.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
@@ -11,9 +12,12 @@ class CheckoutScreen extends ConsumerStatefulWidget {
 }
 
 class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
+  final OrderController _orderController = OrderController();
+  bool _isLoading = false;
   @override
   Widget build(BuildContext context) {
     final cartData = ref.watch(cartProvider);
+    final totalAmount = ref.read(cartProvider.notifier).getTotal();
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
@@ -163,6 +167,90 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     ),
                   );
                 },
+              ),
+            ),
+
+            //Total + BUTTON
+            Container(
+              padding: EdgeInsets.all(width * 0.045),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(22),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.shade200,
+                    blurRadius: 24,
+                    offset: Offset(0, 10),
+                  ),
+                ],
+              ),
+
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Total',
+                        style: GoogleFonts.montserrat(
+                          fontSize: width * 0.04,
+                          color: Colors.grey.shade700,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        '\$${totalAmount.toStringAsFixed(2)}',
+                        style: GoogleFonts.montserrat(
+                          fontSize: width * 0.05,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    height: height * 0.07,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        backgroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadiusGeometry.circular(18),
+                        ),
+                      ),
+                      onPressed: () async {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        await _orderController.placeOrder(
+                          customerId: '12343',
+                          vendorId: cartData.values.first.vendor,
+                          productId: cartData.values.first.id,
+                          productName: cartData.values.first.productName,
+                          quantity: cartData.values.first.quantity,
+                          price: cartData.values.first.productPrice,
+                          deliveryAddress:
+                              'Jovee close avenu benin city, edo state nigeria ',
+                          phoneNumber: "+2348149106125",
+                        );
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      },
+                      child: _isLoading
+                          ? CircularProgressIndicator(color: Colors.white)
+                          : Text(
+                              'Place Order',
+                              style: GoogleFonts.montserrat(
+                                fontSize: width * 0.042,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
