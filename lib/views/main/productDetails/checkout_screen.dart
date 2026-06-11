@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:multi_app/controllers/order_controller.dart';
 import 'package:multi_app/provider/cart_notifier.dart';
+import 'package:multi_app/views/main/productDetails/paypal_webview_screen.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   const CheckoutScreen({super.key});
@@ -223,7 +224,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         setState(() {
                           _isLoading = true;
                         });
-                        await _orderController.placeOrder(
+                        final orderId = await _orderController.placeOrder(
                           customerId: '12343',
                           vendorId: cartData.values.first.vendor,
                           productId: cartData.values.first.id,
@@ -234,9 +235,71 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                               'Jovee close avenu benin city, edo state nigeria ',
                           phoneNumber: "+2348149106125",
                         );
+                        if (orderId == null) {
+                          setState(() {
+                            _isLoading = false;
+                          });
+
+                          print('Order Failed');
+                          return;
+                        }
+                        final paymentData = await _orderController
+                            .createPayPalPayment(
+                              orderId: orderId,
+                              amount: totalAmount,
+                            );
+
+                        if (paymentData == null) {
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          print('Paypal payment creation failed');
+                          return;
+                        }
+                        final approverUrl =
+                            paymentData['approvalUrl'] as String;
+
+                        final paypalOrderId =
+                            paymentData['paypalOrderId'] as String;
                         setState(() {
                           _isLoading = false;
                         });
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return PaypalWebviewScreen(
+                                approvalUrl: approverUrl,
+                                onPaymentApproved: () async {
+                                  final paymentCaptured = await _orderController
+                                      .capturePayPalPayment(
+                                        orderId: orderId,
+                                        paypalOrderId: paypalOrderId,
+                                      );
+
+                                  if (paymentCaptured) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Payment Successfull, order completed',
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Payment capture, failed ',
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                              );
+                            },
+                          ),
+                        );
                       },
                       child: _isLoading
                           ? CircularProgressIndicator(color: Colors.white)

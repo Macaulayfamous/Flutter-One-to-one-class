@@ -1,8 +1,10 @@
+import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:multi_app/models/order_model.dart';
 
 class OrderController {
-  Future<void>placeOrder({
+  Future<String?>placeOrder({
   required String customerId,
   required String vendorId,
   required String productId,
@@ -32,14 +34,75 @@ class OrderController {
           "Content-Type": 'application/json; charset=UTF-8',
         },
       );
+      
+      final data = jsonDecode(response.body);
+
+
       if (response.statusCode == 201) {
-        print('Order Placed successfully');
+         return data['id'];
       } else {
-        print('Order creation failed');
+        print(data);
+        return null;
       }
     } catch (e) {
       print(e.toString());
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> createPayPalPayment({
+    required String orderId,
+    required double amount,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse(
+          'https://rh3sxn2sz8.execute-api.eu-north-1.amazonaws.com/prod/create-paypal-payment',
+        ),
+        body: jsonEncode({"orderId": orderId, "amount": amount}),
+         headers: <String, String>{
+          "Content-Type": 'application/json; charset=UTF-8',
+        },
+      );
+
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 201) {
+        return data;
+      } else {
+        print(data);
+        return null;
+      }
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
+
+  Future<bool> capturePayPalPayment({
+    required String orderId,
+    required String paypalOrderId,
+  })async {
+    try {
+      final response = await http.post(
+        Uri.parse('https://rh3sxn2sz8.execute-api.eu-north-1.amazonaws.com/prod/capture-payment',),
+         headers: <String, String>{
+          "Content-Type": 'application/json; charset=UTF-8',
+        },
+
+        body: jsonEncode({
+          "orderId": orderId,
+          "paypalOrderId": paypalOrderId,
+        }),
+
+      );
+      final data = jsonDecode(response.body);
+      print(data);
+      return response.statusCode ==200 && data['status'] == "COMPLETED";
+    } catch (e) {
+      return false;
     }
   }
 }
+
 
